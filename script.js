@@ -1,34 +1,45 @@
 
-async function fetchNews(country , category){
-  var url = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=3516bfa68f2d4f3caa34d49e499df0d6`
+async function fetchNews(country , category ,page){
+  var url = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&page=${page}&pageSize=21&apiKey=3516bfa68f2d4f3caa34d49e499df0d6`
 
 var req = new Request(url);
 
 let data = await fetch(req)
 let obj = await data.json();
-console.log(obj.articles);
+let ans = obj.articles;
 let str = ""
-
-for(let i of obj.articles){
-   str += `<div class="card mx-3 my-2" style="width: 18rem">
-  <img src="${i.urlToImage}" class="card-img-top" alt="..." />
-  <div class="card-body">
-  <h5 class="card-title">"${i.title}"</h5>
-  <p class="card-text">
-           "${i.description}"
-  </p>
-   <a href="${i.url} target="_blank" class="btn btn-primary">Go to the news</a>
-  </div>
-  </div> `
+let search = document.querySelector("#search");
+let query = search.value;
 let card = document.querySelector(".row");
-card.innerHTML = str
+if(ans.length == 0 ){
+  card.innerHTML = "Oppps no news found for " + query ;
+}
+else{
+  for(let i of obj.articles){
+    str += `<div class="card  mx-3 my-2" style="width: 20rem">
+   <img src="${i.urlToImage}" class="card-img-top" alt="..." />
+   <div class="card-body">
+   <h5 class="card-title">"${i.title}"</h5>
+   <p class="card-text">
+            "${i.description}"
+   </p>
+   <a href="${i.url}" class="btn btn-primary">Go to News</a>
+   
+   </div>
+   </div> `
+
+ card.innerHTML = str
+ 
+ }
 }
 
+
+
 }
 
-fetchNews("in", "business")
-
-
+let currentquery = "business"
+let currentPage = 1;
+fetchNews("in", currentquery ,currentPage)
 
 let sport = document.querySelector(".sport");
 sport.addEventListener('click' ,()=>{
@@ -39,6 +50,38 @@ sport.addEventListener('click' ,()=>{
 let entertainment = document.querySelector(".entertainment");
   entertainment.addEventListener('click',()=>{
     fetchNews("in" , "entertainment")
+  })
+
+
+  let search = document.querySelector("#search");
+  let button = document.querySelector("#button");
+  button.addEventListener('click' , (e)=>{
+    let query = search.value;
+    currentquery = query
+    
+    e.preventDefault();
+    if(currentPage > 1){
+      currentPage= 1;
+      fetchNews("in" ,currentquery, currentPage)
+    }
+    else{
+      fetchNews("in" ,currentquery, currentPage)
+    }
+    
+  })
+
+  let prev = document.querySelector("#prev");
+  prev.addEventListener('click',()=>{
+    if(currentPage>1){
+      currentPage -=1;
+      fetchNews("in" , currentquery ,currentPage)
+    }
+    
+  })
+  let next = document.querySelector("#next");
+  next.addEventListener('click',()=>{
+    currentPage+=1;
+    fetchNews("in" , currentquery , currentPage)
   })
 
 
